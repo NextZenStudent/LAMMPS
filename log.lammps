@@ -1,0 +1,193 @@
+LAMMPS (7 Aug 2019)
+variable        Tset equal 300
+
+#----------------- supercell size, lattice constant --------------------------------------
+variable        xbox equal 3
+variable        ybox equal 40
+variable        zbox equal 15
+variable        a equal 3.52
+
+variable        dx equal sqrt(6)/2
+variable        dy equal sqrt(2)
+variable        dz equal sqrt(3)
+
+
+variable xlength equal ${xbox}*${dx}*$a
+variable xlength equal 3*${dx}*$a
+variable xlength equal 3*1.22474487139159*$a
+variable xlength equal 3*1.22474487139159*3.52
+variable ylength equal ${ybox}*${dy}*$a
+variable ylength equal 40*${dy}*$a
+variable ylength equal 40*1.4142135623731*$a
+variable ylength equal 40*1.4142135623731*3.52
+variable zlength equal ${zbox}*${dz}*$a
+variable zlength equal 15*${dz}*$a
+variable zlength equal 15*1.73205080756888*$a
+variable zlength equal 15*1.73205080756888*3.52
+variable zhalf equal ${zlength}/2
+variable zhalf equal 91.4522826396369/2
+
+variable b2 equal ${a}/${dy}/2
+variable b2 equal 3.52/${dy}/2
+variable b2 equal 3.52/1.4142135623731/2
+
+# -------------- store initial positions of central glide plane (CGP) ----------------------------
+
+variable y1 equal (${ybox}+(${dy}/4)+0.1)*${dy}*${a}/2
+variable y1 equal (40+(${dy}/4)+0.1)*${dy}*${a}/2
+variable y1 equal (40+(1.4142135623731/4)+0.1)*${dy}*${a}/2
+variable y1 equal (40+(1.4142135623731/4)+0.1)*1.4142135623731*${a}/2
+variable y1 equal (40+(1.4142135623731/4)+0.1)*1.4142135623731*3.52/2
+variable y2 equal (${ybox})*${dy}*${a}/2
+variable y2 equal (40)*${dy}*${a}/2
+variable y2 equal (40)*1.4142135623731*${a}/2
+variable y2 equal (40)*1.4142135623731*3.52/2
+variable y3 equal ${y2}-0.5
+variable y3 equal 99.5606347910662-0.5
+variable y4 equal ${y1}+0.5
+variable y4 equal 100.689536378044+0.5
+
+# -------------- general settings --------------------------------------------------------
+dimension       3
+boundary        p p p
+units metal
+atom_style      atomic
+
+
+# -------------- creating a upper & lower regions and as well as - region & simulation box ----------------------
+
+lattice fcc ${a} orient x 1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing ${dx} ${dy} ${dz} origin 0.0 0.0 0.0
+lattice fcc 3.52 orient x 1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing ${dx} ${dy} ${dz} origin 0.0 0.0 0.0
+lattice fcc 3.52 orient x 1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 ${dy} ${dz} origin 0.0 0.0 0.0
+lattice fcc 3.52 orient x 1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 1.4142135623731 ${dz} origin 0.0 0.0 0.0
+lattice fcc 3.52 orient x 1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 1.4142135623731 1.73205080756888 origin 0.0 0.0 0.0
+Lattice spacing in x,y,z = 4.3111 4.97803 6.09682
+region whole block 0.000000 ${xlength} 0.000000 ${ylength} 0.0 ${zlength} units box
+region whole block 0.000000 12.9333058418952 0.000000 ${ylength} 0.0 ${zlength} units box
+region whole block 0.000000 12.9333058418952 0.000000 199.121269582132 0.0 ${zlength} units box
+region whole block 0.000000 12.9333058418952 0.000000 199.121269582132 0.0 91.4522826396369 units box
+create_box 2 whole
+Created orthogonal box = (0 0 0) to (12.9333 199.121 91.4523)
+  1 by 3 by 2 MPI processor grid
+
+region latupper block INF INF INF INF  0.000000 ${zhalf} units box
+region latupper block INF INF INF INF  0.000000 45.7261413198185 units box
+lattice fcc ${a} orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing ${dx} ${dy} ${dz}
+lattice fcc 3.52 orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing ${dx} ${dy} ${dz}
+lattice fcc 3.52 orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 ${dy} ${dz}
+lattice fcc 3.52 orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 1.4142135623731 ${dz}
+lattice fcc 3.52 orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 1.4142135623731 1.73205080756888
+Lattice spacing in x,y,z = 4.3111 4.97803 6.09682
+create_atoms 1 region latupper
+Created 11006 atoms
+  create_atoms CPU = 0.00108 secs
+group latupper region latupper
+11006 atoms in group latupper
+
+region latlower block INF INF INF INF ${zhalf} ${zlength} units box
+region latlower block INF INF INF INF 45.7261413198185 ${zlength} units box
+region latlower block INF INF INF INF 45.7261413198185 91.4522826396369 units box
+lattice fcc ${a} orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing ${dx} ${dy} ${dz}
+lattice fcc 3.52 orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing ${dx} ${dy} ${dz}
+lattice fcc 3.52 orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 ${dy} ${dz}
+lattice fcc 3.52 orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 1.4142135623731 ${dz}
+lattice fcc 3.52 orient x  1 1 -2 orient y 1 -1 0 orient z -1 -1 -1 spacing 1.22474487139159 1.4142135623731 1.73205080756888
+Lattice spacing in x,y,z = 4.3111 4.97803 6.09682
+create_atoms 1 region latlower
+Created 10560 atoms
+  create_atoms CPU = 0.001277 secs
+group latlower region latlower
+10560 atoms in group latlower
+
+
+# ---------------- EAM potential ----------------------------------------
+pair_style      eam/alloy
+pair_coeff      * * FeNiCrCoCu-heafixed.eam.alloy.txt  Ni Ni
+neighbor        2.0 bin
+neigh_modify    delay 5
+
+# -------------- delete atoms to produce shockley partial ------------------------------
+
+region plane block INF INF ${y3} ${y4} ${zhalf} ${zlength} units box
+region plane block INF INF 99.0606347910662 ${y4} ${zhalf} ${zlength} units box
+region plane block INF INF 99.0606347910662 101.189536378044 ${zhalf} ${zlength} units box
+region plane block INF INF 99.0606347910662 101.189536378044 45.7261413198185 ${zlength} units box
+region plane block INF INF 99.0606347910662 101.189536378044 45.7261413198185 91.4522826396369 units box
+group plane region plane
+132 atoms in group plane
+
+delete_atoms region plane
+Deleted 132 atoms, new total = 21434
+
+write_data ini.data
+Neighbor list info ...
+  update every 1 steps, delay 5 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 7.80375
+  ghost atom cutoff = 7.80375
+  binsize = 3.90187, bins = 4 52 24
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eam/alloy, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d/newton
+      bin: standard
+# --------------------------------------------------------------------------------------
+
+change_box all z delta 0 100 units box
+  orthogonal box = (0 0 0) to (12.9333 199.121 191.452)
+change_box all y delta ${b2} 0 units box
+change_box all y delta 1.24450793488832 0 units box
+  orthogonal box = (0 1.24451 0) to (12.9333 199.121 191.452)
+
+thermo          1000
+thermo_style    custom step pe etotal press pxx pyy pzz
+
+# -------------- EQ -----------------------------------------------------
+
+dump geo all atom 10 dump.atom
+minimize 1e-25 1e-25 5000 10000
+WARNING: Using 'neigh_modify every 1 delay 0 check yes' setting during minimization (../min.cpp:168)
+Per MPI rank memory allocation (min/avg/max) = 5.113 | 8.768 | 12.43 Mbytes
+Step PotEng TotEng Press Pxx Pyy Pzz 
+       0   -92281.824   -92281.824    12195.245   -620.54703    39392.555   -2186.2741 
+    1000    -94810.64    -94810.64   -628.38796   -977.13516   -907.91009  -0.11863477 
+    1501    -94810.64    -94810.64   -628.30885   -977.26504    -907.6815  0.019975917 
+Loop time of 62.115 on 6 procs for 1501 steps with 21434 atoms
+
+98.9% CPU use with 6 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+        -92281.8236898     -94810.6400412     -94810.6400412
+  Force two-norm initial, final = 969.796 5.71171e-05
+  Force max component initial, final = 43.0145 7.35153e-06
+  Final line search alpha, max atom move = 1 7.35153e-06
+  Iterations, force evaluations = 1501 2975
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 22.159     | 40.311     | 59.174     | 285.4 | 64.90
+Neigh   | 0.0003     | 0.006521   | 0.012905   |   7.7 |  0.01
+Comm    | 1.2723     | 20.031     | 38.055     | 402.5 | 32.25
+Output  | 0.80558    | 0.87689    | 0.9557     |   6.4 |  1.41
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 0.889      |            |       |  1.43
+
+Nlocal:    3572.33 ave 7005 max 139 min
+Histogram: 3 0 0 0 0 0 0 0 0 3
+Nghost:    7010.67 ave 12120 max 1952 min
+Histogram: 3 0 0 0 0 0 0 0 0 3
+Neighs:    304551 ave 596912 max 12581 min
+Histogram: 3 0 0 0 0 0 0 0 0 3
+
+Total # of neighbors = 1827308
+Ave neighs/atom = 85.2528
+Neighbor list builds = 1
+Dangerous builds = 0
+
+write_data grape.atom
+
+Total wall time: 0:01:02
