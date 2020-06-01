@@ -5,7 +5,7 @@ To run the script type the following in the terminal:
 
 lmp_mpi -in shockley_edge.lmp
 
-So the command in the 6th row is nothing but:
+So the command is nothing but:
 1. lammps executable file (lmp_mpi); (use whatever the lammps executable file in your system or server) 
 2. shockley_edge.lmp is the input lammps file
 
